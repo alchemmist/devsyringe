@@ -1,6 +1,6 @@
 serums:
   https_host:
-    source: ssh -R 80:localhost:8080 serveo.net
+    source: ssh -R 80:localhost:3000 serveo.net
     mask: https?://[^\s]*?\.serveo\.net\b
     targets:
       .env:
@@ -9,5 +9,3 @@ serums:
       js:
         path: ./static/scanner.js
         clues: ["const", "url"]
-
-  
