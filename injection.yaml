@@ -1,0 +1,13 @@
+serums:
+  https_host:
+    source: ssh -R 80:localhost:8080 serveo.net
+    mask: https?://[^\s]*?\.serveo\.net\b
+    targets:
+      .env:
+        path: ./.env
+        clues: ["HOST"]
+      js:
+        path: ./static/scanner.js
+        clues: ["const", "url"]
+
+  
