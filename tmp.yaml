@@ -1,0 +1,8 @@
+serums:
+  https_host:
+    source: ping google.com
+    mask: https?://[^\s]*?\.serveo\.net\b
+    targets:
+      .env:
+        path: ./.env
+        clues: ["HOST"]
