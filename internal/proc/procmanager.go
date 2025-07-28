@@ -37,6 +37,15 @@ type Process struct {
 	Command string     `db:"command"`
 }
 
+func (p *Process) IsAlive() bool {
+	proc, err := os.FindProcess(p.PID)
+	if err != nil {
+		return false
+	}
+	err = proc.Signal(syscall.Signal(0))
+	return err == nil
+}
+
 type ProcManager struct {
 	mu        sync.RWMutex
 	processes []*Process
@@ -51,7 +60,7 @@ func NewProcManager(db *sqlx.DB) *ProcManager {
 	return pm
 }
 
-func (pm *ProcManager) loadProcesses() error {
+func (pm *ProcManager) loadProcesses() {
 	var processes []*Process
 	err := pm.db.Select(&processes, `SELECT * FROM processes;`)
 	exceptions.Check(err)
@@ -60,17 +69,30 @@ func (pm *ProcManager) loadProcesses() error {
 	defer pm.mu.Unlock()
 
 	pm.processes = processes
-	return err
 }
 
-func (pm *ProcManager) saveProcess(proc Process) error {
+func (pm *ProcManager) saveProcess(proc Process) {
+	pm.mu.Lock()
+	defer pm.mu.Unlock()
+
 	_, err := pm.db.NamedExec(`INSERT OR REPLACE INTO processes 
         (title, pid, log_file, status, command) 
         VALUES (:title, :pid, :log_file, :status, :command);`, &proc)
-	return err
+	exceptions.Check(err)
 }
 
-func (pm *ProcManager) KillProcess(title string) {
+func (pm *ProcManager) syncProcessesStatus() {
+	pm.mu.Lock()
+	defer pm.mu.Unlock()
+
+	for _, proc := range pm.processes {
+		if !proc.IsAlive() {
+			proc.Status = Stoped
+		}
+	}
+}
+
+func (pm *ProcManager) DeleteProcess(title string) {
 
 }
 
@@ -79,8 +101,7 @@ func (pm *ProcManager) StopProcess(title string) {
 }
 
 func (pm *ProcManager) GetProcesses() []*Process {
-	err := pm.loadProcesses()
-	exceptions.Check(err)
+	pm.syncProcessesStatus()
 
 	pm.mu.RLock()
 	defer pm.mu.RUnlock()
@@ -115,9 +136,6 @@ func (pm *ProcManager) NewProcess(title string, command string) {
 		Command: command,
 	}
 
-	pm.mu.Lock()
-	defer pm.mu.Unlock()
-
-	err = pm.saveProcess(process)
+	pm.saveProcess(process)
 	exceptions.Check(err)
 }
