@@ -3,6 +3,7 @@ package cli
 import (
 	"devsyringe/internal/config"
 	procmng "devsyringe/internal/proc"
+	"fmt"
 
 	"github.com/spf13/cobra"
 )
@@ -30,7 +31,7 @@ func BuildCli(pm *procmng.ProcManager) *cobra.Command {
 		Use:   "list",
 		Short: "Show dynamic list of running processes",
 		Run: func(cmd *cobra.Command, args []string) {
-
+			PrintProcessList(pm)
 		},
 	}
 
@@ -38,4 +39,11 @@ func BuildCli(pm *procmng.ProcManager) *cobra.Command {
 	rootCmd.AddCommand(listCmd)
 
 	return rootCmd
+}
+
+func PrintProcessList(pm *procmng.ProcManager) {
+	processes := pm.GetProcesses()
+	for _, proc := range processes {
+		fmt.Printf("%s\t%d\t(%s)\n", proc.Title, proc.PID, proc.Status)
+	}
 }

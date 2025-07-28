@@ -1,6 +1,5 @@
 CREATE TABLE IF NOT EXISTS processes (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT NOT NULL,
+    title TEXT PRIMARY KEY,
     pid INTEGER NOT NULL,
     log_file TEXT,
     status TEXT,

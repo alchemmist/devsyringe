@@ -1,5 +1,5 @@
 serums:
-  https_host:
+  ping-test:
     source: ping google.com
     mask: https?://[^\s]*?\.serveo\.net\b
     targets:

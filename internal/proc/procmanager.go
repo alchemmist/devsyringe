@@ -20,7 +20,16 @@ const (
 	Active
 )
 
-type ProcessInfo struct {
+var statusName = map[ProcStatus]string{
+	Stoped: "stoped",
+	Active: "active",
+}
+
+func (ps ProcStatus) String() string {
+	return statusName[ps]
+}
+
+type Process struct {
 	Title   string     `db:"title"`
 	PID     int        `db:"pid"`
 	LogFile string     `db:"log_file"`
@@ -29,22 +38,35 @@ type ProcessInfo struct {
 }
 
 type ProcManager struct {
-	mu        sync.Mutex
-	processes map[string]*ProcessInfo
+	mu        sync.RWMutex
+	processes []*Process
 	db        *sqlx.DB
 }
 
 func NewProcManager(db *sqlx.DB) *ProcManager {
-	return &ProcManager{
-		processes: make(map[string]*ProcessInfo),
-		db:        db,
+	pm := &ProcManager{
+		db: db,
 	}
+	pm.loadProcesses()
+	return pm
 }
 
-func (pm *ProcManager) saveProcInfo(procInfo ProcessInfo) error {
+func (pm *ProcManager) loadProcesses() error {
+	var processes []*Process
+	err := pm.db.Select(&processes, `SELECT * FROM processes;`)
+	exceptions.Check(err)
+
+	pm.mu.Lock()
+	defer pm.mu.Unlock()
+
+	pm.processes = processes
+	return err
+}
+
+func (pm *ProcManager) saveProcess(proc Process) error {
 	_, err := pm.db.NamedExec(`INSERT OR REPLACE INTO processes 
         (title, pid, log_file, status, command) 
-        VALUES (:title, :pid, :log_file, :status, :command)`, &procInfo)
+        VALUES (:title, :pid, :log_file, :status, :command);`, &proc)
 	return err
 }
 
@@ -54,6 +76,16 @@ func (pm *ProcManager) KillProcess(title string) {
 
 func (pm *ProcManager) StopProcess(title string) {
 
+}
+
+func (pm *ProcManager) GetProcesses() []*Process {
+	err := pm.loadProcesses()
+	exceptions.Check(err)
+
+	pm.mu.RLock()
+	defer pm.mu.RUnlock()
+
+	return pm.processes
 }
 
 func (pm *ProcManager) NewProcess(title string, command string) {
@@ -75,7 +107,7 @@ func (pm *ProcManager) NewProcess(title string, command string) {
 	err = cmd.Start()
 	exceptions.Check(err)
 
-	processInfo := ProcessInfo{
+	process := Process{
 		Title:   title,
 		PID:     cmd.Process.Pid,
 		LogFile: outputFile,
@@ -83,6 +115,9 @@ func (pm *ProcManager) NewProcess(title string, command string) {
 		Command: command,
 	}
 
-	err = pm.saveProcInfo(processInfo)
+	pm.mu.Lock()
+	defer pm.mu.Unlock()
+
+	err = pm.saveProcess(process)
 	exceptions.Check(err)
 }
