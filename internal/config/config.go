@@ -45,6 +45,6 @@ func ParseConfig(configPath string) *Config {
 
 func ProcessingConfig(config *Config, pm *procmng.ProcManager) {
 	for title, surm := range config.Serums {
-		pm.NewProcess(title, surm.Source)
+		pm.StartProcess(title, surm.Source)
 	}
 }
