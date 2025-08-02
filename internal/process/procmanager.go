@@ -116,8 +116,25 @@ func (pm *ProcManager) DeleteProcess(title string) error {
 	pm.processes = utils.Remove(pm.processes, proc)
 	pm.mu.Unlock()
 
+	// TODO: update in database (sync system now is ugly)
+
 	pm.deleteProcessFromDB(proc)
 	return nil
+}
+
+func (pm *ProcManager) DeleteAllProcesses() {
+	processes := pm.GetProcesses()
+
+	for _, proc := range processes {
+		if proc.IsAlive() {
+			pm.mu.Lock()
+			proc.Stop()
+			pm.mu.Unlock()
+		}
+		pm.DeleteProcess(proc.Title)
+	}
+
+	pm.syncProcessesStatus()
 }
 
 func (pm *ProcManager) StopProcess(title string) error {
@@ -134,6 +151,7 @@ func (pm *ProcManager) StopProcess(title string) error {
 	defer pm.mu.Unlock()
 	proc.Stop()
 
+	// TODO: update in database (sync system now is ugly)
 	return nil
 }
 
@@ -141,7 +159,6 @@ func (pm *ProcManager) StopAllProcesses() {
 	processes := pm.GetProcesses()
 
 	pm.mu.Lock()
-	defer pm.mu.Unlock()
 
 	for _, proc := range processes {
 		if !proc.IsAlive() {
@@ -149,6 +166,10 @@ func (pm *ProcManager) StopAllProcesses() {
 		}
 		proc.Stop()
 	}
+
+	pm.mu.Unlock()
+
+	pm.syncProcessesStatus()
 }
 
 func (pm *ProcManager) GetProcessLogs(title string) (string, error) {

@@ -51,9 +51,9 @@ func stopCmd(pm *process.ProcManager) *cobra.Command {
 		},
 		Run: func(cmd *cobra.Command, args []string) {
 			if len(args) == 0 {
-				stopProcess("", stopAll, pm)
+				stopProcessHandler("", stopAll, pm)
 			} else {
-				stopProcess(args[0], stopAll, pm)
+				stopProcessHandler(args[0], stopAll, pm)
 			}
 		},
 	}
@@ -63,15 +63,31 @@ func stopCmd(pm *process.ProcManager) *cobra.Command {
 }
 
 func deleteCmd(pm *process.ProcManager) *cobra.Command {
+	var deleteAll bool = false
 	deleteCmd := &cobra.Command{
 		Use: "delete [title]",
 		Short: "If not stoped, stop. Then, delete process " +
 			"with [title] from list and delete all logs.",
-		Args: cobra.MinimumNArgs(1),
+		Args: func(cmd *cobra.Command, args []string) error {
+			deleteAll, _ := cmd.Flags().GetBool("all")
+			if !deleteAll && len(args) < 1 {
+				return fmt.Errorf("You must provide a [title] unless --all is specified.")
+			}
+			if deleteAll && len(args) > 0 {
+				return fmt.Errorf("Cannot provide [title] when --all is used.")
+			}
+			return nil
+		},
 		Run: func(cmd *cobra.Command, args []string) {
-			deleteProcess(args[0], pm)
+			if len(args) == 0 {
+				deleteProcessHandler("", deleteAll, pm)
+			} else {
+				deleteProcessHandler(args[0], deleteAll, pm)
+			}
 		},
 	}
+	deleteCmd.Flags().BoolVarP(&deleteAll, "all", "", false,
+		"Delete (and stop) all process from list.")
 	return deleteCmd
 }
 

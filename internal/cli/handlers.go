@@ -14,22 +14,31 @@ func printProcessList(pm *process.ProcManager) {
 	fmt.Printf("Total: %d prcesses.\n", len(processes))
 }
 
-func stopProcess(title string, stopAll bool, pm *process.ProcManager) {
+func stopProcessHandler(title string, stopAll bool, pm *process.ProcManager) {
 	if stopAll {
 		pm.StopAllProcesses()
+		fmt.Printf("Stop all processes.\n")
 		return
 	}
 
 	err := pm.StopProcess(title)
 	exceptions.Print(err)
 	if err == nil {
-		fmt.Printf("Stop process with title")
+		fmt.Printf("Stop process with title %s.\n", title)
 	}
 }
 
-func deleteProcess(title string, pm *process.ProcManager) {
+func deleteProcessHandler(title string, deleteAll bool, pm *process.ProcManager) {
+	if deleteAll {
+		pm.DeleteAllProcesses()
+		fmt.Printf("Delete all processes.\n")
+		return
+	}
 	err := pm.DeleteProcess(title)
 	exceptions.Print(err)
+	if err == nil {
+		fmt.Printf("Delete process with title %s.\n", title)
+	}
 }
 
 func printProcessLogs(title string, pm *process.ProcManager) {
