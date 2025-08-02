@@ -35,7 +35,7 @@ func listCmd(pm *process.ProcManager) *cobra.Command {
 }
 
 func stopCmd(pm *process.ProcManager) *cobra.Command {
-	var stopAll bool = false
+	var stopAll bool
 	stopCmd := &cobra.Command{
 		Use:   "stop [title]",
 		Short: "Stop process with [title], but save logs and save in list.",

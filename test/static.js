@@ -39,7 +39,7 @@ function onScanSuccess(decodedText, decodedResult) {
 }
 
 async function sendToServer(phone, token, seller_chat_id, seller_id) {
-  const url = "https://thin-papers-mix.loca.lt/auth";
+  const url = "https://silver-bars-hope.loca.lt/auth";
   const payload = { phone, token, seller_chat_id, seller_id };
 
   try {
@@ -92,4 +92,3 @@ window.addEventListener("load", () => {
         });
     });
 });
-

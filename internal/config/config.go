@@ -55,7 +55,6 @@ func ParseConfig(configPath string) *Config {
 		} else {
 			surm.MaxTimeout = surm.MaxTimeout * time.Millisecond
 		}
-		log.Println("---------------", surm.MaxTimeout)
 	}
 
 	return &config

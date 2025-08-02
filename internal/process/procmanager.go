@@ -137,6 +137,20 @@ func (pm *ProcManager) StopProcess(title string) error {
 	return nil
 }
 
+func (pm *ProcManager) StopAllProcesses() {
+	processes := pm.GetProcesses()
+
+	pm.mu.Lock()
+	defer pm.mu.Unlock()
+
+	for _, proc := range processes {
+		if !proc.IsAlive() {
+			continue
+		}
+		proc.Stop()
+	}
+}
+
 func (pm *ProcManager) GetProcessLogs(title string) (string, error) {
 	proc, err := pm.findProcess(filter.ByTitle(title))
 	if err != nil {

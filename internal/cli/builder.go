@@ -10,6 +10,9 @@ func BuildCli(pm *process.ProcManager) *cobra.Command {
 	var rootCmd = &cobra.Command{
 		Use:   "dsy",
 		Short: "Developer tool for hard injection to files.",
+		Run: func(cmd *cobra.Command, args []string) {
+			tui(pm)
+		},
 	}
 
 	rootCmd.AddCommand(injectCmd(pm))
