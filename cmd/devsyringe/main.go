@@ -3,7 +3,7 @@ package main
 import (
 	"devsyringe/internal/cli"
 	"devsyringe/internal/paths"
-	procmng "devsyringe/internal/proc"
+	process "devsyringe/internal/process"
 	"log"
 	"os"
 	"path/filepath"
@@ -35,7 +35,7 @@ func main() {
 	database := InitDB(filepath.Join(paths.GetDataDirectory(), "data.sqlite"))
 	LoadSchema(database, "db/schema.sql")
 
-	processManager := procmng.NewProcManager(database)
+	processManager := process.NewProcManager(database)
 	app := cli.BuildCli(processManager)
 	app.Execute()
 }

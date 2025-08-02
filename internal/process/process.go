@@ -1,4 +1,4 @@
-package procmng
+package process
 
 import (
 	"devsyringe/internal/exceptions"
@@ -71,9 +71,17 @@ func (p *Process) Restart() {
 	cmd.Stdout = logFile
 	cmd.Stderr = logFile
 
-    err = cmd.Start()
+	err = cmd.Start()
 	exceptions.Check(err)
 
-    p.PID = cmd.Process.Pid
-    p.Status = Active
+	p.PID = cmd.Process.Pid
+	p.Status = Active
+}
+
+func (p *Process) GetLogs() string {
+	data, err := os.ReadFile(p.LogFile)
+	exceptions.Check(err)
+
+	logs := string(data)
+	return logs
 }

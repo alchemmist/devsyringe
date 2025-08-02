@@ -2,6 +2,7 @@ serums:
   https_host:
     source: ssh -R 80:localhost:3000 serveo.net
     mask: https?://[^\s]*?\.serveo\.net\b
+    max-timeout: 5
     targets:
       .env:
         path: ./.env

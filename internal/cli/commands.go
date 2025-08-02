@@ -2,12 +2,12 @@ package cli
 
 import (
 	"devsyringe/internal/config"
-	procmng "devsyringe/internal/proc"
+	process "devsyringe/internal/process"
 
 	"github.com/spf13/cobra"
 )
 
-func injectCmd(pm *procmng.ProcManager) *cobra.Command {
+func injectCmd(pm *process.ProcManager) *cobra.Command {
 	var configPath string
 	var injectCmd = &cobra.Command{
 		Use:   "inject",
@@ -22,7 +22,7 @@ func injectCmd(pm *procmng.ProcManager) *cobra.Command {
 	return injectCmd
 }
 
-func listCmd(pm *procmng.ProcManager) *cobra.Command {
+func listCmd(pm *process.ProcManager) *cobra.Command {
 	listCmd := &cobra.Command{
 		Use:   "list",
 		Short: "Show dynamic list of running processes.",
@@ -33,7 +33,7 @@ func listCmd(pm *procmng.ProcManager) *cobra.Command {
 	return listCmd
 }
 
-func stopCmd(pm *procmng.ProcManager) *cobra.Command {
+func stopCmd(pm *process.ProcManager) *cobra.Command {
 	stopCmd := &cobra.Command{
 		Use:   "stop [title]",
 		Short: "Stop process with [title], but save logs and save in list.",
@@ -45,8 +45,8 @@ func stopCmd(pm *procmng.ProcManager) *cobra.Command {
 	return stopCmd
 }
 
-func deleteCmd(pm *procmng.ProcManager) *cobra.Command {
-	stopCmd := &cobra.Command{
+func deleteCmd(pm *process.ProcManager) *cobra.Command {
+	deleteCmd := &cobra.Command{
 		Use: "delete [title]",
 		Short: "If not stoped, stop. Then, delete process " +
 			"with [title] from list and delete all logs.",
@@ -55,5 +55,17 @@ func deleteCmd(pm *procmng.ProcManager) *cobra.Command {
 			DeleteProcess(args[0], pm)
 		},
 	}
-	return stopCmd
+	return deleteCmd
+}
+
+func logsCmd(pm *process.ProcManager) *cobra.Command {
+	logsCmd := &cobra.Command{
+		Use: "logs [title]",
+		Short: "Show logs from process with [title].",
+		Args: cobra.MinimumNArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			PrintProcessLogs(args[0], pm)
+		},
+	}
+	return logsCmd
 }

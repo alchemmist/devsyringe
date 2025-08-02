@@ -1,4 +1,4 @@
-package procmng
+package process
 
 import (
 	"devsyringe/internal/exceptions"
@@ -103,11 +103,10 @@ func (pm *ProcManager) findProcess(searchPredicate ProcessSearchPredicate) (*Pro
 	return nil, fmt.Errorf("no process with this parameter")
 }
 
-func (pm *ProcManager) DeleteProcess(title string) {
+func (pm *ProcManager) DeleteProcess(title string) error {
 	proc, err := pm.findProcess(filter.ByTitle(title))
 	if err != nil {
-		fmt.Printf("No process with title %s.\n", title)
-		return
+		return fmt.Errorf("No process with title %s", title)
 	}
 
 	pm.mu.Lock()
@@ -118,23 +117,35 @@ func (pm *ProcManager) DeleteProcess(title string) {
 	pm.mu.Unlock()
 
 	pm.deleteProcessFromDB(proc)
+	return nil
 }
 
-func (pm *ProcManager) StopProcess(title string) {
+func (pm *ProcManager) StopProcess(title string) error {
 	proc, err := pm.findProcess(filter.ByTitle(title))
 	if err != nil {
-		fmt.Printf("No process with title %s.\n", title)
-		return
+		return fmt.Errorf("No process with title %s", title)
 	}
 
 	if !proc.IsAlive() {
-		fmt.Printf("Process %s already stoped.\n", title)
-		return
+		return fmt.Errorf("Process %s already stoped", title)
 	}
 
 	pm.mu.Lock()
 	defer pm.mu.Unlock()
 	proc.Stop()
+
+	return nil
+}
+
+func (pm *ProcManager) GetProcessLogs(title string) (string, error) {
+	proc, err := pm.findProcess(filter.ByTitle(title))
+	if err != nil {
+		return "", fmt.Errorf("No process with title %s", title)
+	}
+
+	pm.mu.RLock()
+	defer pm.mu.RUnlock()
+	return proc.GetLogs(), nil
 }
 
 func (pm *ProcManager) GetProcesses() []*Process {
@@ -146,7 +157,7 @@ func (pm *ProcManager) GetProcesses() []*Process {
 	return pm.processes
 }
 
-func (pm *ProcManager) StartProcess(title string, command string) {
+func (pm *ProcManager) StartProcess(title string, command string) *Process {
 	var proc *Process
 	var err error
 
@@ -180,4 +191,5 @@ func (pm *ProcManager) StartProcess(title string, command string) {
 		}
 	}
 	pm.saveProcessToDB(proc)
+	return proc
 }
