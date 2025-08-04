@@ -46,7 +46,3 @@ func printProcessLogs(title string, pm *process.ProcManager) {
 	exceptions.Print(err)
 	fmt.Printf("%s\n", logs)
 }
-
-func tui(pm *process.ProcManager) {
-
-}
