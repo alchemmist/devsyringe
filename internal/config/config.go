@@ -88,7 +88,8 @@ func ProcessingConfig(config *Config, pm *process.ProcManager) {
 
 		select {
 		case <-ctx.Done():
-			fmt.Printf("The timeout (%d ms) for waiting for logs for %s has expired. Skip this serm.\n", surm.MaxTimeout, title)
+			fmt.Printf("The timeout (%d ms) for waiting value in logs for %s has expired. Skip this serm.\n", surm.MaxTimeout, title)
+			pm.DeleteProcess(title)
 			continue
 		case logs := <-logChan:
 			value := re.FindSubmatch([]byte(logs))[0]
