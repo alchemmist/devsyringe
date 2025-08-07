@@ -1,15 +1,17 @@
-package cli
+package tui
 
 import (
 	"devsyringe/internal/exceptions"
 	process "devsyringe/internal/process"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/table"
 	"github.com/charmbracelet/bubbles/textinput"
+	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -30,11 +32,49 @@ type model struct {
 	input               textinput.Model
 	confirmingDeleteAll bool
 	inputSubmitted      bool
+	showLogs            bool
+	viewport            viewport.Model
+	filename            string
+	content             string
+	ready               bool
+}
+
+var (
+	titleStyle = lipgloss.NewStyle().
+			Bold(true).
+			Padding(0, 1).
+			Border(lipgloss.RoundedBorder()).
+			BorderRight(true)
+
+	infoStyle = lipgloss.NewStyle().
+			Padding(0, 1).
+			Border(lipgloss.RoundedBorder()).
+			BorderLeft(true)
+)
+
+func (m model) headerView() string {
+	title := titleStyle.Render(m.filename)
+	line := strings.Repeat("─", max(0, m.viewport.Width-lipgloss.Width(title)))
+	return lipgloss.JoinHorizontal(lipgloss.Center, title, line)
+}
+
+func (m model) footerView() string {
+	info := infoStyle.Render(fmt.Sprintf("%3.f%%", m.viewport.ScrollPercent()*100))
+	line := strings.Repeat("─", max(0, m.viewport.Width-lipgloss.Width(info)))
+	return lipgloss.JoinHorizontal(lipgloss.Center, line, info)
+}
+
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
 }
 
 type keyMap struct {
 	Up        key.Binding
 	Down      key.Binding
+	Logs      key.Binding
 	Stop      key.Binding
 	Delete    key.Binding
 	DeleteAll key.Binding
@@ -62,6 +102,10 @@ var keys = keyMap{
 	Down: key.NewBinding(
 		key.WithKeys("down", "j"),
 		key.WithHelp("↓/j", "Next process"),
+	),
+	Logs: key.NewBinding(
+		key.WithKeys("L"),
+		key.WithHelp("L", "show logs"),
 	),
 	Stop: key.NewBinding(
 		key.WithKeys("S"),
@@ -99,6 +143,20 @@ func (m model) tick() tea.Cmd {
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		headerHeight := lipgloss.Height(m.headerView())
+		footerHeight := lipgloss.Height(m.footerView())
+		verticalMarginHeight := headerHeight + footerHeight
+
+		if !m.ready {
+			m.viewport = viewport.New(msg.Width, msg.Height-verticalMarginHeight)
+			m.viewport.YPosition = headerHeight
+			m.viewport.SetContent(m.content)
+			m.ready = true
+		} else {
+			m.viewport.Width = msg.Width
+			m.viewport.Height = msg.Height - verticalMarginHeight
+		}
 
 	case tickMsg:
 		if !m.inputSubmitted && !m.showHelp {
@@ -108,6 +166,36 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.KeyMsg:
 		key := msg.String()
+
+		if key == "l" && !m.showHelp && !m.confirmingDeleteAll {
+			row := m.table.SelectedRow()
+			if len(row) != 0 {
+				title := row[1]
+				proc, err := m.pm.GetProcess(title)
+				exceptions.Check(err)
+
+				tmp := strings.Split(proc.LogFile, "/")
+				m.filename = tmp[len(tmp)-1]
+				m.content = proc.GetLogs()
+				m.viewport.SetContent(proc.GetLogs())
+				m.showLogs = true
+				return m, nil
+			}
+		}
+
+		if m.showLogs {
+			switch key {
+			case "esc":
+				m.showLogs = false
+				return m, nil
+			case "q", "ctrl+c":
+				return m, tea.Quit
+			}
+
+			var cmd tea.Cmd
+			m.viewport, cmd = m.viewport.Update(msg)
+			return m, cmd
+		}
 
 		if key == "?" {
 			m.showHelp = !m.showHelp
@@ -148,22 +236,18 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 		switch key {
-		case "up", "k":
-			if m.cursor > 0 {
-				m.cursor--
-			}
-		case "down", "j":
-			if m.cursor < len(m.items)-1 {
-				m.cursor++
-			}
 		case "S":
 			row := m.table.SelectedRow()
-			m.pm.StopProcess(row[1]) // row[1] = Title
-			m.table.SetRows(generateRows(m.pm))
+			if len(row) != 0 {
+				m.pm.StopProcess(row[1])
+				m.table.SetRows(generateRows(m.pm))
+			}
 		case "D":
 			row := m.table.SelectedRow()
-			m.pm.DeleteProcess(row[1]) // row[1] = Title
-			m.table.SetRows(generateRows(m.pm))
+			if len(row) != 0 {
+				m.pm.DeleteProcess(row[1])
+				m.table.SetRows(generateRows(m.pm))
+			}
 		case "alt+D":
 			m.confirmingDeleteAll = true
 			m.input.Focus()
@@ -180,13 +264,18 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
-	if m.showHelp {
+	switch {
+	case m.showHelp:
 		return baseStyle.Render(m.help.View(m.keys)) + "\n"
-	}
-	if m.confirmingDeleteAll {
+	case !m.ready:
+		return "\n  Initializing..."
+	case m.showLogs:
+		return fmt.Sprintf("%s\n%s\n%s", m.headerView(), m.viewport.View(), m.footerView())
+	case m.confirmingDeleteAll:
 		return baseStyle.Render("Are you sure to delete (and stop) ALL processes?\nThe logs will be cleared.\n\n" + m.input.View() + "\n(Press enter to confirm or esc to cancel)")
+	default:
+		return baseStyle.Render(m.table.View()) + "\n"
 	}
-	return baseStyle.Render(m.table.View()) + "\n"
 }
 
 func generateRows(pm *process.ProcManager) []table.Row {
@@ -213,7 +302,7 @@ func generateItems(pm *process.ProcManager) []string {
 	return items
 }
 
-func tui(pm *process.ProcManager) {
+func Tui(pm *process.ProcManager) {
 	columns := []table.Column{
 		{Title: "PID", Width: 8},
 		{Title: "Title", Width: 15},
@@ -252,6 +341,10 @@ func tui(pm *process.ProcManager) {
 		Bold(false)
 	t.SetStyles(s)
 
+	width, height := tea.WindowSizeMsg{Width: 100, Height: 30}.Width, tea.WindowSizeMsg{Height: 30}.Height
+	vp := viewport.New(width, height-4)
+	vp.Style = baseStyle
+
 	helpModel := help.New()
 	helpModel.ShowAll = true
 
@@ -269,7 +362,11 @@ func tui(pm *process.ProcManager) {
 		help:      helpModel,
 		keys:      keys,
 		input:     input,
-	})
+		viewport:  vp,
+	}, tea.WithMouseCellMotion())
+	fmt.Print("\0337")
 	_, err := p.Run()
 	exceptions.Check(err)
+	fmt.Print("\0338")
+	fmt.Print("\033[J")
 }

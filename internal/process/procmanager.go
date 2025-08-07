@@ -172,6 +172,17 @@ func (pm *ProcManager) StopAllProcesses() {
 	pm.syncProcessesStatus()
 }
 
+func (pm *ProcManager) GetProcess(title string) (*Process, error) {
+	proc, err := pm.findProcess(filter.ByTitle(title))
+	if err != nil {
+		return nil, fmt.Errorf("No process with title %s", title)
+	}
+
+	pm.mu.RLock()
+	defer pm.mu.RUnlock()
+	return proc, nil
+}
+
 func (pm *ProcManager) GetProcessLogs(title string) (string, error) {
 	proc, err := pm.findProcess(filter.ByTitle(title))
 	if err != nil {

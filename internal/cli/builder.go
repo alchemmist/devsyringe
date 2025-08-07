@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"devsyringe/internal/cli/tui"
 	process "devsyringe/internal/process"
 
 	"github.com/spf13/cobra"
@@ -22,7 +23,7 @@ func BuildCli(pm *process.ProcManager) *cobra.Command {
 		Use:   "dsy",
 		Short: "\nDeveloper tool for hard injection to files.\n" + syringeArt,
 		Run: func(cmd *cobra.Command, args []string) {
-			tui(pm)
+			tui.Tui(pm)
 		},
 	}
 
