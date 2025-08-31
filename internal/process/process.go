@@ -67,7 +67,6 @@ func (p *Process) Restart() {
 
 	cmd := exec.Command("sh", "-c", p.Command)
 
-	// Условная настройка SysProcAttr
 	if runtime.GOOS != "windows" {
 		cmd.SysProcAttr = &syscall.SysProcAttr{
 			Setsid: true,
@@ -90,4 +89,3 @@ func (p *Process) GetLogs() string {
 
 	return string(data)
 }
-
