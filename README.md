@@ -49,6 +49,7 @@ Devsryinge run command, cut vlue from ouput with mask and replace value in targe
 ## Installation
 
 Install with go:
+
 ```sh
 go install github.com/alchemmist/devsyringe/cmd/dsy@latest
 ```
