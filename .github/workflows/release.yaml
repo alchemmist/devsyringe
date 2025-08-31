@@ -10,8 +10,6 @@ jobs:
       matrix:
         os: [linux, darwin]
         arch: [amd64, arm64]
-    outputs:
-      artifacts-path: ${{ steps.set-path.outputs.path }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v4
@@ -23,11 +21,8 @@ jobs:
           ext=""
           if [ "${{ matrix.os }}" == "windows" ]; then ext=".exe"; fi
           GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -o releases/dsy-${{ matrix.os }}-${{ matrix.arch }}${ext} ./cmd/dsy
-      - name: Set artifacts path
-        id: set-path
-        run: echo "::set-output name=path::releases/*"
-      - name: Upload artifact for next job
-        uses: actions/upload-artifact@v3
+      - name: Upload artifact for release
+        uses: actions/upload-artifact@v4
         with:
           name: binaries-${{ matrix.os }}-${{ matrix.arch }}
           path: releases/*
@@ -36,20 +31,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Download all binaries
-        uses: actions/download-artifact@v3
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
         with:
           name: binaries-linux-amd64
           path: releases/
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: binaries-linux-arm64
           path: releases/
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: binaries-darwin-amd64
           path: releases/
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: binaries-darwin-arm64
           path: releases/
