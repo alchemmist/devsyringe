@@ -1,9 +1,10 @@
 package cli
 
 import (
-	"devsyringe/internal/exceptions"
-	process "devsyringe/internal/process"
 	"fmt"
+
+	"github.com/alchemmist/devsyringe/internal/exceptions"
+	process "github.com/alchemmist/devsyringe/internal/process"
 )
 
 func printProcessList(pm *process.ProcManager) {

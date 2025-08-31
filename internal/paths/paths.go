@@ -1,9 +1,10 @@
 package paths
 
 import (
-	"devsyringe/internal/exceptions"
 	"os"
 	"path/filepath"
+
+	"github.com/alchemmist/devsyringe/internal/exceptions"
 )
 
 func GetDataDirectory() string {

@@ -1,9 +1,10 @@
 package cli
 
 import (
-	"devsyringe/internal/config"
-	process "devsyringe/internal/process"
 	"fmt"
+
+	"github.com/alchemmist/devsyringe/internal/config"
+	process "github.com/alchemmist/devsyringe/internal/process"
 
 	"github.com/spf13/cobra"
 )

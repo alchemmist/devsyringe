@@ -1,12 +1,13 @@
 package main
 
 import (
-	"devsyringe/internal/cli"
-	"devsyringe/internal/paths"
-	process "devsyringe/internal/process"
 	"log"
 	"os"
 	"path/filepath"
+
+	"github.com/alchemmist/devsyringe/internal/cli"
+	"github.com/alchemmist/devsyringe/internal/paths"
+	process "github.com/alchemmist/devsyringe/internal/process"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"

@@ -1,11 +1,12 @@
 package tui
 
 import (
-	"devsyringe/internal/exceptions"
-	process "devsyringe/internal/process"
 	"fmt"
 	"strings"
 	"time"
+
+	"github.com/alchemmist/devsyringe/internal/exceptions"
+	process "github.com/alchemmist/devsyringe/internal/process"
 
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"

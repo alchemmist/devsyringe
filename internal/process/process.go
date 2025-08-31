@@ -1,13 +1,14 @@
 package process
 
 import (
-	"devsyringe/internal/exceptions"
-	"devsyringe/internal/paths"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"syscall"
+
+	"github.com/alchemmist/devsyringe/internal/exceptions"
+	"github.com/alchemmist/devsyringe/internal/paths"
 )
 
 type ProcStatus int

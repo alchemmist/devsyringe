@@ -3,7 +3,6 @@ package config
 import (
 	"bufio"
 	"context"
-	"devsyringe/internal/exceptions"
 	"errors"
 	"fmt"
 	"log"
@@ -12,7 +11,9 @@ import (
 	"strings"
 	"time"
 
-	process "devsyringe/internal/process"
+	"github.com/alchemmist/devsyringe/internal/exceptions"
+
+	process "github.com/alchemmist/devsyringe/internal/process"
 
 	"github.com/goccy/go-yaml"
 )

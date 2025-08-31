@@ -1,8 +1,9 @@
 package cli
 
 import (
-	"devsyringe/internal/cli/tui"
-	process "devsyringe/internal/process"
+	process "github.com/alchemmist/devsyringe/internal/process"
+
+	"github.com/alchemmist/devsyringe/internal/cli/tui"
 
 	"github.com/spf13/cobra"
 )

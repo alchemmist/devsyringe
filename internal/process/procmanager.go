@@ -1,15 +1,16 @@
 package process
 
 import (
-	"devsyringe/internal/exceptions"
-	"devsyringe/internal/paths"
-	"devsyringe/internal/utils"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"sync"
 	"syscall"
+
+	"github.com/alchemmist/devsyringe/internal/exceptions"
+	"github.com/alchemmist/devsyringe/internal/paths"
+	"github.com/alchemmist/devsyringe/internal/utils"
 
 	"github.com/jmoiron/sqlx"
 )
