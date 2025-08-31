@@ -39,7 +39,7 @@ function onScanSuccess(decodedText, decodedResult) {
 }
 
 async function sendToServer(phone, token, seller_chat_id, seller_id) {
-  const url = "https://lazy-sheep-fly.loca.lt/auth";
+  const url = "https://easy-news-fail.loca.lt/auth";
   const payload = { phone, token, seller_chat_id, seller_id };
 
   try {

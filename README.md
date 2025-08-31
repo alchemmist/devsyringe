@@ -27,8 +27,8 @@ Devsyringe solves this problem: it can fetch values from any source and inject t
 
 ## Demo
 
-<p align="center">
-    <img src="./media/demo.gif" alt="Demo GIF" width="700" style="border-radius: 15px; box-shadow: 0px 0px 40px rgba(0, 0, 0, 0.3)">
+<p align="left">
+    <img src="./media/demo2.gif" alt="Demo GIF" width="600" style="border-radius: 15px; box-shadow: 0px 0px 40px rgba(0, 0, 0, 0.3)">
 </p>
 
 In this demo we use this compose file:
@@ -46,61 +46,54 @@ serums:
 
 Devsryinge run command, cut vlue from ouput with mask and replace value in target `.env` file under the mask to new. Very simple!
 
-## Features
+<h2 id="usage">Usage</h2>
 
-- Commands for preocess cofnig and controll processes, which need to be got injectable values. See [Usage](#usage).
+- Commands for preocess cofnig and controll processes, which need to be got injectable values. See table bottom.
 
 - <p>Use <code>dsy [command] --help</code> for more information about a command.</p>
+
 - Use `dsy` without commands or flags for run TUI with table of processes.
   - In TUI you can see table of processes, which devsyringe run. In table you can see status of process (`stoped` or `active`), command for running, `PID` and title.
   - Here you can controll processes with hotkeys. Press `?` for see help. You can stop process, delete process, see full ouput of process and so on.
-
-**TUI**:
-
-<p align="center">
-    <img src="./media/tui-demo.gif" alt="Demo GIF" width="700" style="border-radius: 15px; box-shadow: 0px 0px 40px rgba(0, 0, 0, 0.3)">
-</p>
-
-<h2 id="usage">Usage</h2>
-Available commands for process config and controll processes:
-<table>
-  <thead>
-    <tr>
-      <th>Command</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><code>completion</code></td>
-      <td>Generate the autocompletion script for the specified shell</td>
-    </tr>
-    <tr>
-      <td><code>delete</code></td>
-      <td>If not stopped, stop. Then delete process with [title] from list and delete all logs.</td>
-    </tr>
-    <tr>
-      <td><code>help</code></td>
-      <td>Help about any command</td>
-    </tr>
-    <tr>
-      <td><code>inject</code></td>
-      <td>Start an injection based on some config</td>
-    </tr>
-    <tr>
-      <td><code>list</code></td>
-      <td>Show dynamic list of running processes</td>
-    </tr>
-    <tr>
-      <td><code>logs</code></td>
-      <td>Show logs from process with [title]</td>
-    </tr>
-    <tr>
-      <td><code>stop</code></td>
-      <td>Stop process with [title], but save logs and keep in list</td>
-    </tr>
-  </tbody>
-</table>
+  Available commands for process config and controll processes:
+  <table>
+    <thead>
+      <tr>
+        <th>Command</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>completion</code></td>
+        <td>Generate the autocompletion script for the specified shell</td>
+      </tr>
+      <tr>
+        <td><code>delete</code></td>
+        <td>If not stopped, stop. Then delete process with [title] from list and delete all logs.</td>
+      </tr>
+      <tr>
+        <td><code>help</code></td>
+        <td>Help about any command</td>
+      </tr>
+      <tr>
+        <td><code>inject</code></td>
+        <td>Start an injection based on some config</td>
+      </tr>
+      <tr>
+        <td><code>list</code></td>
+        <td>Show dynamic list of running processes</td>
+      </tr>
+      <tr>
+        <td><code>logs</code></td>
+        <td>Show logs from process with [title]</td>
+      </tr>
+      <tr>
+        <td><code>stop</code></td>
+        <td>Stop process with [title], but save logs and keep in list</td>
+      </tr>
+    </tbody>
+  </table>
 
 ## Configuration
 
@@ -125,13 +118,12 @@ serums:
 
 `<title>` — unique name of the serum (e.g. localtunnel, https_host, ping-test).
 
-| Option       | Type      | Description                                                                 | Example |
-|--------------|-----------|-----------------------------------------------------------------------------|---------|
-| `source`     | string    | Command to run. Its output will be scanned to extract values.               | `lt --port 80` |
-| `mask`       | regex     | Regular expression to capture the desired part of the output. If omitted, the whole output is used. | `https://[a-z0-9\-]+\.loca\.lt` |
-| `max-timeout`| int (sec) | Maximum time to wait for `source` output before failing.                    | `5` |
-| `targets`    | map       | Where to inject the extracted value(s). Each target has its own settings.   | see below |
-
+| Option        | Type      | Description                                                                                         | Example                         |
+| ------------- | --------- | --------------------------------------------------------------------------------------------------- | ------------------------------- |
+| `source`      | string    | Command to run. Its output will be scanned to extract values.                                       | `lt --port 80`                  |
+| `mask`        | regex     | Regular expression to capture the desired part of the output. If omitted, the whole output is used. | `https://[a-z0-9\-]+\.loca\.lt` |
+| `max-timeout` | int (sec) | Maximum time to wait for `source` output before failing.                                            | `5`                             |
+| `targets`     | map       | Where to inject the extracted value(s). Each target has its own settings.                           | see below                       |
 
 **Targets:**
 Each serum may inject values into one or multiple files.
