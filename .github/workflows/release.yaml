@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: [linux, darwin, windows]
+        os: [linux, darwin]
         arch: [amd64, arm64]
     steps:
       - name: Checkout repository
