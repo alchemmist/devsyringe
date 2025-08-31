@@ -1,7 +1,10 @@
 package cli
 
 import (
+	"os"
+
 	process "github.com/alchemmist/devsyringe/internal/process"
+	"github.com/alchemmist/devsyringe/internal/version"
 
 	"github.com/alchemmist/devsyringe/internal/cli/tui"
 
@@ -26,6 +29,17 @@ func BuildCli(pm *process.ProcManager) *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			tui.Tui(pm)
 		},
+	}
+
+	var showVersion bool
+
+	rootCmd.PersistentFlags().BoolVarP(&showVersion, "version", "v", false, "Show version")
+
+	rootCmd.PersistentPreRun = func(cmd *cobra.Command, args []string) {
+		if showVersion {
+			println("Devsyringe", version.Version)
+			os.Exit(0)
+		}
 	}
 
 	rootCmd.AddCommand(injectCmd(pm))
