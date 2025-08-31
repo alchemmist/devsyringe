@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"syscall"
 
 	"github.com/alchemmist/devsyringe/internal/exceptions"
@@ -65,8 +66,12 @@ func (p *Process) Restart() {
 	exceptions.Check(err)
 
 	cmd := exec.Command("sh", "-c", p.Command)
-	cmd.SysProcAttr = &syscall.SysProcAttr{
-		Setsid: true,
+
+	// Условная настройка SysProcAttr
+	if runtime.GOOS != "windows" {
+		cmd.SysProcAttr = &syscall.SysProcAttr{
+			Setsid: true,
+		}
 	}
 
 	cmd.Stdout = logFile
@@ -83,6 +88,6 @@ func (p *Process) GetLogs() string {
 	data, err := os.ReadFile(p.LogFile)
 	exceptions.Check(err)
 
-	logs := string(data)
-	return logs
+	return string(data)
 }
+

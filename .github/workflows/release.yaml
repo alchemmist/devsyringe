@@ -1,40 +1,40 @@
-name: Release Devsyringe
-
+name: release
 on:
   push:
     tags:
       - 'v*'
-
 jobs:
   release:
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        os: [linux, darwin, windows]
+        arch: [amd64, arm64]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
           go-version: 1.24
-
       - name: Get version from tag
         id: get_version
         run: |
           echo "VERSION=${GITHUB_REF##*/}" >> $GITHUB_ENV
-
       - name: Build binary
-        run: go build -o bin/dsy ./cmd/dsy
-
-      - name: Create GitHub Release
+        run: |
+          mkdir -p releases
+          ext=""
+          if [ "${{ matrix.os }}" == "windows" ]; then ext=".exe"; fi
+          GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -o releases/dsy-${{ matrix.os }}-${{ matrix.arch }}${ext} ./cmd/dsy
+      - name: Upload binaries as release
+        if: matrix.os == 'windows' && matrix.arch == 'amd64' # выполняем только один раз для релиза
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ env.VERSION }}
           name: Release ${{ env.VERSION }}
           draft: false
           prerelease: false
-
-          artifacts: bin/dsy
+          artifacts: releases/*
           generate_release_notes: true
-
           latest: true
