@@ -60,7 +60,7 @@ func ParseConfig(configPath string) *Config {
 	return &config
 }
 
-func ProcessingConfig(config *Config, pm *process.ProcManager) {
+func ProcessingConfig(config *Config, verboseLogs bool, pm *process.ProcManager) {
 	for title, surm := range config.Serums {
 		proc := pm.StartProcess(title, surm.Source)
 		re := regexp.MustCompile(surm.Mask)
@@ -122,7 +122,11 @@ func ProcessingConfig(config *Config, pm *process.ProcManager) {
 					if allCluesContained {
 						updatedLine := re.ReplaceAllString(line, string(value))
 						newFileLines = append(newFileLines, updatedLine)
-						fmt.Printf("%s:%d: replace %s to %s\n", target.Path, lineNumber, line, updatedLine)
+						if verboseLogs {
+							fmt.Printf("%s:%d: replace %s to %s\n", target.Path, lineNumber, line, updatedLine)
+						} else {
+							fmt.Printf("→ Update %s.\n", target.Path)
+						}
 					} else {
 						newFileLines = append(newFileLines, line)
 					}

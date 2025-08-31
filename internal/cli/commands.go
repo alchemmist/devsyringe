@@ -10,16 +10,19 @@ import (
 
 func injectCmd(pm *process.ProcManager) *cobra.Command {
 	var configPath string
+	var verboseLogs bool = false
 	var injectCmd = &cobra.Command{
 		Use:   "inject",
 		Short: "Start a injection based on some config.",
 		Run: func(cmd *cobra.Command, args []string) {
 			conf := config.ParseConfig(configPath)
-			config.ProcessingConfig(conf, pm)
+			config.ProcessingConfig(conf, verboseLogs, pm)
 		},
 	}
 	injectCmd.Flags().StringVarP(&configPath, "config", "c", "devsyringe.yaml",
 		"The config .yaml file for devsyring")
+	injectCmd.Flags().BoolVarP(&verboseLogs, "verbose", "v", false,
+		"Show source and replaced line in every target")
 	return injectCmd
 }
 
