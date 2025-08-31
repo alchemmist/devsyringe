@@ -46,6 +46,13 @@ serums:
 
 Devsryinge run command, cut vlue from ouput with mask and replace value in target `.env` file under the mask to new. Very simple!
 
+## Installation
+
+Install with go:
+```sh
+go install github.com/alchemmist/devsyringe/cmd/dsy@latest
+```
+
 <h2 id="usage">Usage</h2>
 
 - Commands for preocess cofnig and controll processes, which need to be got injectable values. See table bottom.
