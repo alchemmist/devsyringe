@@ -13,16 +13,10 @@ jobs:
     outputs:
       artifacts-path: ${{ steps.set-path.outputs.path }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      - name: Set up Go
-        uses: actions/setup-go@v4
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
         with:
           go-version: 1.24
-      - name: Get version from tag
-        id: get_version
-        run: |
-          echo "VERSION=${GITHUB_REF##*/}" >> $GITHUB_ENV
       - name: Build binary
         run: |
           mkdir -p releases
@@ -32,7 +26,34 @@ jobs:
       - name: Set artifacts path
         id: set-path
         run: echo "::set-output name=path::releases/*"
-      - name: Upload binaries as release
+      - name: Upload artifact for next job
+        uses: actions/upload-artifact@v3
+        with:
+          name: binaries-${{ matrix.os }}-${{ matrix.arch }}
+          path: releases/*
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Download all binaries
+        uses: actions/download-artifact@v3
+        with:
+          name: binaries-linux-amd64
+          path: releases/
+      - uses: actions/download-artifact@v3
+        with:
+          name: binaries-linux-arm64
+          path: releases/
+      - uses: actions/download-artifact@v3
+        with:
+          name: binaries-darwin-amd64
+          path: releases/
+      - uses: actions/download-artifact@v3
+        with:
+          name: binaries-darwin-arm64
+          path: releases/
+      - name: Create GitHub Release
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ github.ref_name }}
