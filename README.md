@@ -48,10 +48,16 @@ Devsryinge run command, cut vlue from ouput with mask and replace value in targe
 
 ## Installation
 
-Install with go:
+1. Install with **Go**:
 
 ```sh
 go install github.com/alchemmist/devsyringe/cmd/dsy@latest
+```
+
+2. Arch from **AUR**:
+```sh
+paru -S devsyringe
+# or: yay -S devsyringe
 ```
 
 <h2 id="usage">Usage</h2>

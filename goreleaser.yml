@@ -1,18 +1,18 @@
 project_name: devsyringe
 builds:
   - main: ./cmd/dsy
-    binary: dsy
+    binary: dsy 
     goos: [linux, darwin]
     goarch: [amd64, arm64]
 archives:
   - format: tar.gz
     name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
 nfpms:
-  - package_name: dsy
+  - package_name: devsyringe
     formats: [deb, rpm]
-    bindir: /usr/bin
+    bindir: /usr/bin 
 brews:
-  - name: dsy
+  - name: devsyringe 
     tap:
       owner: alchemmist
       name: homebrew-tap
@@ -22,3 +22,4 @@ brews:
     folder: Formula
     homepage: "https://github.com/alchemmist/devsyringe"
     description: "Developer tool for hard injection to files"
+    binary: dsy
