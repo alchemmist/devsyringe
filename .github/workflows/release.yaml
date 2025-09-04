@@ -4,58 +4,17 @@ on:
     tags:
       - 'v*'
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        os: [linux, darwin]
-        arch: [amd64, arm64]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v4
         with:
           go-version: 1.24
-      - name: Build binary
-        run: |
-          mkdir -p releases
-          ext=""
-          if [ "${{ matrix.os }}" == "windows" ]; then ext=".exe"; fi
-          GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -o releases/dsy-${{ matrix.os }}-${{ matrix.arch }}${ext} ./cmd/dsy
-      - name: Upload artifact for release
-        uses: actions/upload-artifact@v4
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v5
         with:
-          name: binaries-${{ matrix.os }}-${{ matrix.arch }}
-          path: releases/*
-  release:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: binaries-linux-amd64
-          path: releases/
-      - uses: actions/download-artifact@v4
-        with:
-          name: binaries-linux-arm64
-          path: releases/
-      - uses: actions/download-artifact@v4
-        with:
-          name: binaries-darwin-amd64
-          path: releases/
-      - uses: actions/download-artifact@v4
-        with:
-          name: binaries-darwin-arm64
-          path: releases/
-      - name: Create GitHub Release
-        uses: ncipollo/release-action@v1
-        with:
-          tag: ${{ github.ref_name }}
-          name: Release ${{ github.ref_name }}
-          draft: false
-          prerelease: false
-          artifacts: releases/*
-          generateReleaseNotes: true
-          makeLatest: true
-          token: ${{ secrets.GH_TOKEN }}
+          version: latest
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
