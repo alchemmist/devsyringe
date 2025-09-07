@@ -54,10 +54,16 @@ Devsryinge run command, cut vlue from ouput with mask and replace value in targe
 go install github.com/alchemmist/devsyringe/cmd/dsy@latest
 ```
 
-2. Arch from **AUR**:
+2. Arch from **`AUR`**:
 ```sh
 paru -S devsyringe
 # or: yay -S devsyringe
+```
+
+3. Mac with `brew`:
+```sh
+brew tap alchemmist/homebrew-tap
+brew install devsyringe
 ```
 
 <h2 id="usage">Usage</h2>

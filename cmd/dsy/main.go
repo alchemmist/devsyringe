@@ -1,8 +1,8 @@
 package main
 
 import (
+	_ "embed"
 	"log"
-	"os"
 	"path/filepath"
 
 	"github.com/alchemmist/devsyringe/internal/cli"
@@ -13,13 +13,11 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func LoadSchema(db *sqlx.DB, path string) error {
-	schemaBytes, err := os.ReadFile(path)
-	if err != nil {
-		return err
-	}
+//go:embed schema.sql
+var schemaSQL string
 
-	_, err = db.Exec(string(schemaBytes))
+func LoadSchema(db *sqlx.DB, schema string) error {
+	_, err := db.Exec(schema)
 	return err
 }
 
@@ -34,7 +32,9 @@ func InitDB(path string) *sqlx.DB {
 
 func main() {
 	database := InitDB(filepath.Join(paths.GetDataDirectory(), "data.sqlite"))
-	LoadSchema(database, "db/schema.sql")
+	if err := LoadSchema(database, schemaSQL); err != nil {
+		log.Fatalf("failed to load schema: %v", err)
+	}
 
 	processManager := process.NewProcManager(database)
 	app := cli.BuildCli(processManager)
