@@ -117,7 +117,7 @@ brew install devsyringe
 
 ## Configuration
 
-Devsyringe uses a **YAML file** (usually named `syringe.yaml`) to describe what commands to run,
+Devsyringe uses a **YAML file** (usually named `devsyringe.yaml`) to describe what commands to run,
 how to extract values from their output, and where to inject them.
 
 ### Top-level structure
