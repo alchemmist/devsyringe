@@ -8,7 +8,7 @@
 ![Go](https://img.shields.io/badge/1.24-default?label=Go)
 [![Build](https://github.com/alchemmist/devsyringe/actions/workflows/build.yaml/badge.svg?branch=main)](https://github.com/alchemmist/devsyringe/actions/workflows/build.yaml)
 
-CLI for inject dynamic values into code/config files from external commands using a declarative YAML config.
+CLI for inject dynamic values into code/config files from external commands using a declarative YAML config. More about this tool in article: «[Devsyringe: Stop Copy-Pasting Dynamic Values](https://alchemmist.xyz/articles/the-devsyringe/)»
 
 ## Why?
 
