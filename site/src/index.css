@@ -1,0 +1,168 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Technical Design System for Devsyringe */
+
+@layer base {
+  :root {
+    /* Core colors - Technical dark theme */
+    --background: 218 27% 8%;
+    --foreground: 0 0% 95%;
+
+    --card: 218 27% 10%;
+    --card-foreground: 0 0% 95%;
+
+    --popover: 218 27% 10%;
+    --popover-foreground: 0 0% 95%;
+
+    /* Injection green - primary brand color */
+    --primary: 142 76% 36%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 142 86% 55%;
+
+    /* Muted grays for technical feel */
+    --secondary: 217 10% 20%;
+    --secondary-foreground: 0 0% 95%;
+
+    --muted: 217 10% 15%;
+    --muted-foreground: 217 10% 65%;
+
+    /* Accent cyan for highlights */
+    --accent: 189 100% 50%;
+    --accent-foreground: 218 27% 8%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 217 10% 20%;
+    --input: 217 10% 15%;
+    --ring: 142 76% 36%;
+
+    /* Terminal-inspired elements */
+    --terminal: 0 0% 8%;
+    --terminal-border: 217 10% 25%;
+    --code-bg: 217 20% 12%;
+    
+    /* Injection flow colors */
+    --flow-start: 189 100% 50%;
+    --flow-end: 142 76% 36%;
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-injection: linear-gradient(90deg, hsl(var(--flow-start)), hsl(var(--flow-end)));
+    --gradient-glow: radial-gradient(ellipse at center, hsl(var(--primary-glow) / 0.3), transparent 70%);
+    
+    /* Shadows with injection theme */
+    --shadow-injection: 0 0 30px hsl(var(--primary-glow) / 0.3);
+    --shadow-terminal: 0 10px 30px -10px hsl(0 0% 0% / 0.5);
+    
+    --radius: 0.75rem;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  /* Light mode - keeping original theme for consistency */
+  .light {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+  }
+  
+  /* Typography and animations */
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap');
+  
+  * {
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+  
+  body {
+    font-family: 'Inter', sans-serif;
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+  
+  .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+  
+  /* Animation utilities */
+  .animate-injection-flow {
+    animation: injection-flow 3s ease-in-out infinite;
+  }
+  
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+  
+  .animate-terminal-typing {
+    animation: terminal-typing 4s ease-in-out infinite;
+  }
+  
+  @keyframes injection-flow {
+    0%, 100% { 
+      background: hsl(var(--flow-start));
+      box-shadow: 0 0 20px hsl(var(--flow-start) / 0.5);
+    }
+    50% { 
+      background: hsl(var(--flow-end));
+      box-shadow: 0 0 20px hsl(var(--flow-end) / 0.5);
+    }
+  }
+  
+  @keyframes pulse-glow {
+    0%, 100% { 
+      box-shadow: var(--shadow-injection);
+      transform: scale(1);
+    }
+    50% { 
+      box-shadow: 0 0 50px hsl(var(--primary-glow) / 0.6);
+      transform: scale(1.02);
+    }
+  }
+  
+  @keyframes terminal-typing {
+    0%, 90%, 100% { opacity: 1; }
+    45% { opacity: 0.7; }
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
