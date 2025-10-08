@@ -1,3 +1,22 @@
+body {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+body::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
+*::-webkit-scrollbar {
+  display: none !important;
+}
+html {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
