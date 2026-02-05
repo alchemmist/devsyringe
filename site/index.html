@@ -1,25 +1,319 @@
 <!doctype html>
-<html lang="en">
+<html lang="ru">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/svg+xml" href="/logo.svg">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="shortcut icon" href="favicon.ico">
     <title>Devsyringe</title>
-    <meta name="description" content="CLI tool for injecting dynamic values into static files. Automate tunnel URLs, API tokens, and configuration updates with declarative YAML configs." />
+    <meta name="description" content="CLI tool for injecting dynamic values into static files using a declarative YAML config." />
     <meta name="author" content="alchemmist" />
     <meta name="keywords" content="CLI, Go, automation, configuration, dynamic values, tunnel, ngrok, localtunnel, DevOps" />
 
-    <meta property="og:title" content="Devsyringe - Stop Copy-Pasting Dynamic Values" />
-    <meta property="og:description" content="CLI tool for injecting dynamic values into static files. Automate your development workflow." />
+    <meta property="og:title" content="Devsyringe — stop copy-pasting dynamic values" />
+    <meta property="og:description" content="Run a command, capture with regex, inject into static files. No build system required." />
     <meta property="og:type" content="website" />
-
     <meta name="twitter:card" content="summary_large_image" />
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+
+    
     <script defer src="https://umami.alchemmist.xyz/script.js" data-website-id="0689945f-c70c-4306-ad6e-dec7169384d8"></script>
   </head>
 
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <main class="shell">
+      <header>
+        <div class="logo">
+          <span class="dot"></span>
+          <span>devsyringe</span>
+        </div>
+        <nav class="nav">
+          <a href="#why">why</a>
+          <a href="#flow">flow</a>
+          <a href="#diagram">diagram</a>
+          <a href="#config">config</a>
+          <a href="https://github.com/alchemmist/devsyringe">github</a>
+        </nav>
+      </header>
+
+      <section class="hero" id="top">
+        <div>
+          <div class="tagline">cli / static files / regex injection</div>
+          <h1>Inject dynamic values into static files without manual copy-paste.</h1>
+          <p>
+            Devsyringe is a Go CLI that runs a command, extracts a value with a regex, and injects it
+            into one or more files. You define the rules once in `devsyringe.yaml`, then run one command.
+          </p>
+          <p class="section-lead">Install: <code>go install github.com/alchemmist/devsyringe/cmd/dsy@latest</code></p>
+          <div class="cta">
+            <a class="btn primary" href="https://github.com/alchemmist/devsyringe">Open repository</a>
+            <a class="btn" href="#config">View config</a>
+          </div>
+        </div>
+        <div class="panel terminal">
+          <div class="terminal-header">
+            <span></span><span></span><span></span>
+          </div>
+          <pre>
+<span class="accent">$</span> dsy inject -c devsyringe.yaml
+→ Update ./.env.
+→ Update ./static/config.js.
+status: <span class="accent">ok</span>
+
+mode: strict
+          </pre>
+        </div>
+      </section>
+
+      <section class="sections" id="why">
+        <div class="section-title">Why</div>
+        <p class="section-lead">
+          Static files do not have runtime config injection. When your tunnel URL, token, or build
+          value changes, you end up copying it into HTML, JS configs, or legacy files. Devsyringe
+          automates the update without turning your project into a templating system.
+        </p>
+        <p class="section-lead">
+          The core idea is simple: run a command, extract the value with a regex, and inject it into
+          one or more target files using clues.
+        </p>
+        <div class="cards">
+          <article class="card">
+            <h3>no templates</h3>
+            <p>Works on plain text. No build system, no runtime hooks, no dependencies.</p>
+          </article>
+          <article class="card">
+            <h3>one source, many files</h3>
+            <p>Extract once with a regex, inject into any number of targets.</p>
+          </article>
+          <article class="card">
+            <h3>local and CI</h3>
+            <p>Run `dsy inject` locally, or in CI to keep docs and configs up to date.</p>
+          </article>
+          <article class="card">
+            <h3>observable</h3>
+            <p>Built-in TUI shows running processes, status, and logs.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="sections" id="flow">
+        <div class="section-title">Flow</div>
+        <p class="section-lead">Define sources and targets in YAML, then run one command.</p>
+        <div class="cards">
+          <article class="card">
+            <h3>1. run</h3>
+            <p>Start a command and read its live output.</p>
+          </article>
+          <article class="card">
+            <h3>2. match</h3>
+            <p>Use `mask` (regex) to capture the dynamic value.</p>
+          </article>
+          <article class="card">
+            <h3>3. locate</h3>
+            <p>Find target lines by `clues` — multiple words on the same line.</p>
+          </article>
+          <article class="card">
+            <h3>4. inject</h3>
+            <p>Replace the matched value and write back to disk.</p>
+          </article>
+        </div>
+        <p class="section-lead">Tip: run <code>dsy</code> without arguments to open the TUI process table.</p>
+      </section>
+
+      <section class="split">
+        <div class="sections" id="use-cases">
+          <div class="section-title">Use Cases</div>
+          <p class="section-lead">Designed for situations where simple files still need dynamic values.</p>
+          <div class="cards">
+            <article class="card">
+              <h3>tunnel URLs</h3>
+              <p>Extract a live URL from a tunnel command and inject it into `.env` and client configs.</p>
+            </article>
+            <article class="card">
+              <h3>tokens and keys</h3>
+              <p>Pull tokens from CLIs and keep infra configs in sync.</p>
+            </article>
+            <article class="card">
+              <h3>build metadata</h3>
+              <p>Inject git SHA or build versions into docs and status pages.</p>
+            </article>
+            <article class="card">
+              <h3>docs automation</h3>
+              <p>Update README or LaTeX files with live stats pulled from APIs.</p>
+            </article>
+            <article class="card">
+              <h3>infra updates</h3>
+              <p>Fetch addresses, endpoints, or secrets and update static config files.</p>
+            </article>
+          </div>
+        </div>
+
+        <div class="sections demo" id="demo">
+          <div class="section-title">Demo</div>
+          <p class="section-lead">
+            A single command starts a tunnel, grabs the URL, and updates multiple files in place.
+          </p>
+          <img src="demo2.gif" alt="Devsyringe demo animation" loading="lazy" />
+        </div>
+      </section>
+
+      <section class="sections" id="install">
+        <div class="section-title">Install</div>
+        <p class="section-lead">Choose the package manager you already use.</p>
+        <pre class="code-block"># Go
+go install github.com/alchemmist/devsyringe/cmd/dsy@latest
+
+# Arch (AUR)
+paru -S devsyringe
+# or: yay -S devsyringe
+
+# macOS (brew)
+brew tap alchemmist/homebrew-tap
+brew install devsyringe</pre>
+      </section>
+
+      <section class="sections" id="cli">
+        <div class="section-title">CLI</div>
+        <p class="section-lead">Core commands that power the workflow.</p>
+        <div class="cards">
+          <article class="card">
+            <h3>inject</h3>
+            <p>Start an injection based on a YAML config.</p>
+          </article>
+          <article class="card">
+            <h3>list</h3>
+            <p>Show the dynamic list of running processes.</p>
+          </article>
+          <article class="card">
+            <h3>logs</h3>
+            <p>Read logs for a running process by title.</p>
+          </article>
+          <article class="card">
+            <h3>stop / delete</h3>
+            <p>Stop a process or delete it with logs.</p>
+          </article>
+        </div>
+        <p class="section-lead">Run <code>dsy help</code> or <code>dsy [command] --help</code> for options.</p>
+      </section>
+
+      <section class="panel diagram" id="diagram">
+        <div class="diagram-header">
+          <span class="signal"><span></span> flow map</span>
+          <span>mode: strict</span>
+          <span>latency: depends on source</span>
+        </div>
+        <div class="diagram-graphic">
+          <div class="diagram-box">
+            <strong>source command</strong>
+            <span><code>lt --port 8080</code></span>
+            <span>live output stream</span>
+          </div>
+          <div class="diagram-arrow">→</div>
+          <div class="diagram-box">
+            <strong>mask (regex)</strong>
+            <span><code>https://...loca.lt</code></span>
+            <span>first match wins</span>
+          </div>
+          <div class="diagram-arrow">→</div>
+          <div class="diagram-box">
+            <strong>targets + clues</strong>
+            <span><code>.env</code> and <code>src/config.js</code></span>
+            <span>replace only matched lines</span>
+          </div>
+        </div>
+        <div class="tape">
+          <span>source: command output</span>
+          <span>match: regex</span>
+          <span>targets: clues</span>
+          <span>file update</span>
+        </div>
+      </section>
+
+      <section class="panel config" id="config">
+        <div class="meta">
+          <span class="signal"><span></span> live snippet</span>
+          <span>format: YAML</span>
+          <span>engine: devsyringe</span>
+        </div>
+        <p class="section-lead">
+          Each `serum` describes one dynamic value: how to obtain it, how to match it, and where to inject it.
+        </p>
+        <pre id="configText">serums:
+  localtunnel:
+    source: lt --port 8080
+    mask: https://[a-z0-9\\-]+\\.loca\\.lt
+    targets:
+      env_file:
+        path: ./.env
+        clues: ["API_BASE_URL"]
+      frontend_config:
+        path: ./src/config.js
+        clues: ["API_URL", "const"]
+        </pre>
+        <button class="copy" id="copyBtn">copy snippet</button>
+        <p class="section-lead">
+          What it does: starts `lt`, waits for a tunnel URL in the output, then replaces the value on lines
+          that contain the clues in both `.env` and `src/config.js`.
+        </p>
+        <p class="section-lead">
+          Run: <code>dsy inject -c devsyringe.yaml</code>.
+        </p>
+        <p class="section-lead">Step by step:</p>
+        <div class="cards">
+          <article class="card">
+            <h3>1. command</h3>
+            <p>Launches `lt --port 8080` and reads the stream output.</p>
+          </article>
+          <article class="card">
+            <h3>2. match</h3>
+            <p>Captures the first URL matching the regex mask.</p>
+          </article>
+          <article class="card">
+            <h3>3. replace</h3>
+            <p>Finds lines that include the clues and replaces the matched value.</p>
+          </article>
+          <article class="card">
+            <h3>4. write</h3>
+            <p>Saves both files and prints update logs to the terminal.</p>
+          </article>
+        </div>
+      </section>
+
+      <footer class="foot">
+        <div class="foot-row">
+          <span>© 2026 alchemmist. Devsyringe.</span>
+          <span>Built with Go. Landing is static HTML.</span>
+        </div>
+        <div class="foot-row">
+          <div class="foot-links">
+            <a href="https://github.com/alchemmist/devsyringe">GitHub</a>
+            <a href="https://alchemmist.xyz/articles/the-devsyringe/">Article</a>
+            <a href="mailto:anton.ingrish@gmail.com">Contact</a>
+          </div>
+          <span>License: MIT</span>
+        </div>
+      </footer>
+    </main>
+
+    <script>
+      const copyBtn = document.getElementById("copyBtn");
+      const configText = document.getElementById("configText");
+
+      copyBtn.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(configText.textContent.trim());
+          copyBtn.textContent = "copied";
+          setTimeout(() => {
+            copyBtn.textContent = "copy snippet";
+          }, 1400);
+        } catch (error) {
+          copyBtn.textContent = "copy failed";
+        }
+      });
+    </script>
   </body>
 </html>

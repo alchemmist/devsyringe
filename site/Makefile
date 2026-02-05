@@ -7,6 +7,6 @@ restart:
 	docker run -d \
 		--name devsyringe \
 		--network personal-site_default \
-		-p 5143:5143 \
+		-p 5143:80 \
 		--restart=always \
 		devsyringe-landing

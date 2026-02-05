@@ -1,10 +1,11 @@
-FROM node:20-alpine
+FROM nginx:alpine
 
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY . .
-RUN npm run build
+COPY index.html /usr/share/nginx/html/index.html
+COPY style.css /usr/share/nginx/html/style.css
+COPY logo.svg /usr/share/nginx/html/logo.svg
+COPY demo2.gif /usr/share/nginx/html/demo2.gif
+COPY favicon.ico /usr/share/nginx/html/favicon.ico
+COPY robots.txt /usr/share/nginx/html/robots.txt
 
 EXPOSE 5143
-CMD ["npm", "run", "preview", "--", "--port", "5143", "--host", "0.0.0.0"]
+CMD ["nginx", "-g", "daemon off;"]
