@@ -3,7 +3,7 @@ module github.com/alchemmist/devsyringe
 go 1.24.4
 
 require (
-	github.com/charmbracelet/bubbles v0.21.1
+	github.com/charmbracelet/bubbles/v2 v2.2.0
 	github.com/charmbracelet/bubbletea v1.3.10
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/goccy/go-yaml v1.19.2
