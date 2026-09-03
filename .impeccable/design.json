@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-03T11:00:00Z",
+  "title": "Design System: Devsyringe",
+  "extensions": {
+    "colorMeta": {
+      "ink": {"role": "primary", "displayName": "Blue Graphite Ink", "canonical": "#1c2940"},
+      "paper": {"role": "neutral", "displayName": "Laboratory Paper", "canonical": "#f6f8f5"},
+      "link": {"role": "primary", "displayName": "Instrument Indigo", "canonical": "#4055a8"},
+      "command-surface": {"role": "secondary", "displayName": "Reagent Green", "canonical": "#e6f0dc"},
+      "config-surface": {"role": "tertiary", "displayName": "Instrument Blue", "canonical": "#e8eef7"}
+    },
+    "shadows": [],
+    "motion": [],
+    "breakpoints": [{"name": "mobile", "value": "600px"}]
+  },
+  "components": [
+    {
+      "name": "Code surface",
+      "kind": "custom",
+      "refersTo": "code-surface",
+      "description": "Flat readable surface for commands and configuration.",
+      "html": "<div class=\"ds-code\"><code>go install github.com/alchemmist/devsyringe/cmd/dsy@latest</code><button>Copy command</button></div>",
+      "css": ".ds-code { display: grid; grid-template-columns: 1fr auto; gap: 22px; align-items: center; padding: 19px 21px; color: #1c2940; background: #e6f0dc; font: 14px/1.65 ui-monospace, SFMono-Regular, Consolas, monospace; } .ds-code button { color: #4055a8; background: transparent; border: 0; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; } .ds-code button:hover { text-decoration-thickness: 2px; } .ds-code button:focus-visible { outline: 2px solid #4055a8; outline-offset: 3px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Project README",
+    "overview": "A concise technical document: one readable column, system monospace, real code, and explicit links.",
+    "keyCharacteristics": ["680px reading column", "System monospace", "Laboratory palette", "High contrast"],
+    "rules": [{"name": "Evidence Is Content", "body": "Use real commands and configuration instead of promotional containers.", "section": "layout"}],
+    "dos": ["Keep the page as one readable technical document."],
+    "donts": ["Do not use pale gray for necessary information.", "Do not add marketing-card grids or oversized empty regions."]
+  }
+}
