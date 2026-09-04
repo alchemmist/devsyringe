@@ -20,7 +20,9 @@ profiles:
         with:
           go-version: "1.27"
       - name: Install dependencies
-        run: go mod tidy
+        run: |
+          go mod tidy
+          git diff --exit-code -- go.mod go.sum
 nodes:
   build:
     title: Build binary

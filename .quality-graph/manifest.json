@@ -6,7 +6,7 @@
     ]
   },
   "defaultBranch": "main",
-  "graphDigest": "e0a8e7994e374eb1f9f989ed2f72ed1550cef24608e68cc7ab1f388bb9325ce1",
+  "graphDigest": "d33da993e3071b682f1ad32cec93842ad2cddb5af7dca5ff3a3bf6a4ee086666",
   "graphVersion": 0,
   "labels": {
     "enabled": false
@@ -85,7 +85,7 @@
         },
         {
           "name": "Install dependencies",
-          "run": "go mod tidy"
+          "run": "go mod tidy\ngit diff --exit-code -- go.mod go.sum\n"
         }
       ]
     }

@@ -25,7 +25,11 @@ jobs:
         with:
           go-version: '1.27'
       - name: Install dependencies
-        run: go mod tidy
+        run: 'go mod tidy
+
+          git diff --exit-code -- go.mod go.sum
+
+          '
       - run: go build ./cmd/dsy
         name: Run Build binary
         id: quality-command
@@ -41,7 +45,7 @@ jobs:
           adapter: exit-code
           report-path: ''
           command-outcome: ${{ steps.quality-command.outcome }}
-          graph-digest: e0a8e7994e374eb1f9f989ed2f72ed1550cef24608e68cc7ab1f388bb9325ce1
+          graph-digest: d33da993e3071b682f1ad32cec93842ad2cddb5af7dca5ff3a3bf6a4ee086666
           approval-findings: 'true'
           approval-files: 'false'
           approval-node: 'false'
@@ -72,7 +76,11 @@ jobs:
         with:
           go-version: '1.27'
       - name: Install dependencies
-        run: go mod tidy
+        run: 'go mod tidy
+
+          git diff --exit-code -- go.mod go.sum
+
+          '
       - run: go test ./...
         name: Run Run tests
         id: quality-command
@@ -88,7 +96,7 @@ jobs:
           adapter: exit-code
           report-path: ''
           command-outcome: ${{ steps.quality-command.outcome }}
-          graph-digest: e0a8e7994e374eb1f9f989ed2f72ed1550cef24608e68cc7ab1f388bb9325ce1
+          graph-digest: d33da993e3071b682f1ad32cec93842ad2cddb5af7dca5ff3a3bf6a4ee086666
           approval-findings: 'true'
           approval-files: 'false'
           approval-node: 'false'
