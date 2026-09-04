@@ -8,13 +8,13 @@ import (
 	"github.com/alchemmist/devsyringe/internal/exceptions"
 	process "github.com/alchemmist/devsyringe/internal/process"
 
-	"github.com/charmbracelet/bubbles/help"
-	"github.com/charmbracelet/bubbles/key"
-	"github.com/charmbracelet/bubbles/table"
-	"github.com/charmbracelet/bubbles/textinput"
-	"github.com/charmbracelet/bubbles/viewport"
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
+	"charm.land/bubbles/v2/help"
+	"charm.land/bubbles/v2/key"
+	"charm.land/bubbles/v2/table"
+	"charm.land/bubbles/v2/textinput"
+	"charm.land/bubbles/v2/viewport"
+	tea "charm.land/bubbletea/v2"
+	"charm.land/lipgloss/v2"
 )
 
 var baseStyle = lipgloss.NewStyle().
@@ -55,13 +55,13 @@ var (
 
 func (m model) headerView() string {
 	title := titleStyle.Render(m.filename)
-	line := strings.Repeat("─", max(0, m.viewport.Width-lipgloss.Width(title)))
+	line := strings.Repeat("─", max(0, m.viewport.Width()-lipgloss.Width(title)))
 	return lipgloss.JoinHorizontal(lipgloss.Center, title, line)
 }
 
 func (m model) footerView() string {
 	info := infoStyle.Render(fmt.Sprintf("%3.f%%", m.viewport.ScrollPercent()*100))
-	line := strings.Repeat("─", max(0, m.viewport.Width-lipgloss.Width(info)))
+	line := strings.Repeat("─", max(0, m.viewport.Width()-lipgloss.Width(info)))
 	return lipgloss.JoinHorizontal(lipgloss.Center, line, info)
 }
 
@@ -150,13 +150,13 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		verticalMarginHeight := headerHeight + footerHeight
 
 		if !m.ready {
-			m.viewport = viewport.New(msg.Width, msg.Height-verticalMarginHeight)
+			m.viewport = viewport.New(viewport.WithWidth(msg.Width), viewport.WithHeight(msg.Height-verticalMarginHeight))
 			m.viewport.YPosition = headerHeight
 			m.viewport.SetContent(m.content)
 			m.ready = true
 		} else {
-			m.viewport.Width = msg.Width
-			m.viewport.Height = msg.Height - verticalMarginHeight
+			m.viewport.SetWidth(msg.Width)
+			m.viewport.SetHeight(msg.Height - verticalMarginHeight)
 		}
 
 	case tickMsg:
@@ -264,19 +264,23 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m model) View() string {
+func (m model) View() tea.View {
+	var content string
 	switch {
 	case m.showHelp:
-		return baseStyle.Render(m.help.View(m.keys)) + "\n"
+		content = baseStyle.Render(m.help.View(m.keys)) + "\n"
 	case !m.ready:
-		return "\n  Initializing..."
+		content = "\n  Initializing..."
 	case m.showLogs:
-		return fmt.Sprintf("%s\n%s\n%s", m.headerView(), m.viewport.View(), m.footerView())
+		content = fmt.Sprintf("%s\n%s\n%s", m.headerView(), m.viewport.View(), m.footerView())
 	case m.confirmingDeleteAll:
-		return baseStyle.Render("Are you sure to delete (and stop) ALL processes?\nThe logs will be cleared.\n\n" + m.input.View() + "\n(Press enter to confirm or esc to cancel)")
+		content = baseStyle.Render("Are you sure to delete (and stop) ALL processes?\nThe logs will be cleared.\n\n" + m.input.View() + "\n(Press enter to confirm or esc to cancel)")
 	default:
-		return baseStyle.Render(m.table.View()) + "\n"
+		content = baseStyle.Render(m.table.View()) + "\n"
 	}
+	view := tea.NewView(content)
+	view.MouseMode = tea.MouseModeCellMotion
+	return view
 }
 
 func generateRows(pm *process.ProcManager) []table.Row {
@@ -343,7 +347,7 @@ func Tui(pm *process.ProcManager) {
 	t.SetStyles(s)
 
 	width, height := tea.WindowSizeMsg{Width: 100, Height: 30}.Width, tea.WindowSizeMsg{Height: 30}.Height
-	vp := viewport.New(width, height-4)
+	vp := viewport.New(viewport.WithWidth(width), viewport.WithHeight(height-4))
 	vp.Style = baseStyle
 
 	helpModel := help.New()
@@ -353,7 +357,7 @@ func Tui(pm *process.ProcManager) {
 	input.Placeholder = "Type yes (y) to delete all"
 	input.Focus()
 	input.CharLimit = 20
-	input.Width = 30
+	input.SetWidth(30)
 
 	p := tea.NewProgram(model{
 		tickEvery: 500 * time.Millisecond,
@@ -364,7 +368,7 @@ func Tui(pm *process.ProcManager) {
 		keys:      keys,
 		input:     input,
 		viewport:  vp,
-	}, tea.WithMouseCellMotion())
+	})
 	fmt.Print("\0337")
 	_, err := p.Run()
 	exceptions.Check(err)
