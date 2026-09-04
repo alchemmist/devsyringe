@@ -1,0 +1,26 @@
+---
+version: 0
+provider:
+  name: github
+  configuration:
+    runtime:
+      action: alchemmist/quality-graph@a4a65abfc9364da6801be56b992358d302c7ad77
+profiles:
+  default:
+    runner: ubuntu-latest
+    setup:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: "false"
+      - uses: actions/setup-go@v7
+        with:
+          go-version: "1.27"
+      - name: Install dependencies
+        run: go mod tidy
+nodes:
+  build:
+    title: Build binary
+    run: go build ./cmd/dsy
+  test:
+    title: Run tests
+    run: go test ./...

@@ -1,0 +1,96 @@
+{
+  "administration": {
+    "roles": [
+      "admin"
+    ]
+  },
+  "graphDigest": "d1df2434d0fcf244c4fcf4dbaf92e63ea4d2159b70cfcf94f88c532b4ff53b0b",
+  "graphVersion": 0,
+  "labels": {
+    "enabled": false
+  },
+  "manifestVersion": 0,
+  "nodes": [
+    {
+      "env": {},
+      "id": "build",
+      "needs": [],
+      "policy": {
+        "approvals": {
+          "files": false,
+          "findings": true,
+          "node": false
+        },
+        "blocking": true,
+        "blockingSeverities": [
+          "error"
+        ]
+      },
+      "profile": "default",
+      "result": {
+        "adapter": "exit-code"
+      },
+      "step": {
+        "run": "go build ./cmd/dsy"
+      },
+      "title": "Build binary"
+    },
+    {
+      "env": {},
+      "id": "test",
+      "needs": [],
+      "policy": {
+        "approvals": {
+          "files": false,
+          "findings": true,
+          "node": false
+        },
+        "blocking": true,
+        "blockingSeverities": [
+          "error"
+        ]
+      },
+      "profile": "default",
+      "result": {
+        "adapter": "exit-code"
+      },
+      "step": {
+        "run": "go test ./..."
+      },
+      "title": "Run tests"
+    }
+  ],
+  "profiles": {
+    "default": {
+      "env": {},
+      "permissions": {
+        "contents": "read"
+      },
+      "runner": "ubuntu-latest",
+      "services": {},
+      "setup": [
+        {
+          "uses": "actions/checkout@v7",
+          "with": {
+            "persist-credentials": "false"
+          }
+        },
+        {
+          "uses": "actions/setup-go@v7",
+          "with": {
+            "go-version": "1.27"
+          }
+        },
+        {
+          "name": "Install dependencies",
+          "run": "go mod tidy"
+        }
+      ]
+    }
+  },
+  "provider": "github",
+  "resultSchemaVersion": 0,
+  "runtime": {
+    "action": "alchemmist/quality-graph@a4a65abfc9364da6801be56b992358d302c7ad77"
+  }
+}
