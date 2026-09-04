@@ -108,18 +108,29 @@
     </footer>
 
     <script>
+      const resetTimers = new WeakMap();
+
       document.querySelectorAll("[data-copy]").forEach((button) => {
         button.addEventListener("click", async () => {
           const source = document.getElementById(button.dataset.copy);
           if (!source) return;
-          const initial = button.textContent;
+          const initial = button.dataset.initialLabel || button.textContent;
+          button.dataset.initialLabel = initial;
           try {
             await navigator.clipboard.writeText(source.textContent.trim());
             button.textContent = "Copied";
           } catch {
             button.textContent = "Select and copy";
           }
-          setTimeout(() => (button.textContent = initial), 1400);
+          const previousTimer = resetTimers.get(button);
+          if (previousTimer) clearTimeout(previousTimer);
+          resetTimers.set(
+            button,
+            setTimeout(() => {
+              button.textContent = initial;
+              resetTimers.delete(button);
+            }, 1400),
+          );
         });
       });
     </script>
