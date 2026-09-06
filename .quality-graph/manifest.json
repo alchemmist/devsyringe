@@ -6,7 +6,7 @@
     ]
   },
   "defaultBranch": "main",
-  "graphDigest": "d33da993e3071b682f1ad32cec93842ad2cddb5af7dca5ff3a3bf6a4ee086666",
+  "graphDigest": "6274b6b3bc083b3bbd696b343a14f2be75bd9f85b35893688744a4609d602e14",
   "graphVersion": 0,
   "labels": {
     "enabled": false
@@ -15,8 +15,34 @@
   "nodes": [
     {
       "env": {},
-      "id": "build",
+      "id": "workflow-graph",
       "needs": [],
+      "policy": {
+        "approvals": {
+          "files": false,
+          "findings": true,
+          "node": false
+        },
+        "blocking": true,
+        "blockingSeverities": [
+          "error"
+        ]
+      },
+      "profile": "quality-graph",
+      "result": {
+        "adapter": "exit-code"
+      },
+      "step": {
+        "run": "uvx --from quality-graph-cli==0.1.8 --with quality-graph-github==0.1.8 qg validate"
+      },
+      "title": "Workflow graph validation"
+    },
+    {
+      "env": {},
+      "id": "build",
+      "needs": [
+        "workflow-graph"
+      ],
       "policy": {
         "approvals": {
           "files": false,
@@ -40,7 +66,9 @@
     {
       "env": {},
       "id": "test",
-      "needs": [],
+      "needs": [
+        "workflow-graph"
+      ],
       "policy": {
         "approvals": {
           "files": false,
@@ -86,6 +114,35 @@
         {
           "name": "Install dependencies",
           "run": "go mod tidy\ngit diff --exit-code -- go.mod go.sum\n"
+        }
+      ]
+    },
+    "quality-graph": {
+      "env": {},
+      "permissions": {
+        "contents": "read"
+      },
+      "runner": "ubuntu-latest",
+      "services": {},
+      "setup": [
+        {
+          "uses": "actions/checkout@v7",
+          "with": {
+            "persist-credentials": "false"
+          }
+        },
+        {
+          "uses": "actions/setup-go@v7",
+          "with": {
+            "go-version": "1.27"
+          }
+        },
+        {
+          "name": "Install dependencies",
+          "run": "go mod tidy\ngit diff --exit-code -- go.mod go.sum\n"
+        },
+        {
+          "uses": "astral-sh/setup-uv@v7"
         }
       ]
     }

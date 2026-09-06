@@ -23,10 +23,20 @@ profiles:
         run: |
           go mod tidy
           git diff --exit-code -- go.mod go.sum
+  quality-graph:
+    extends: default
+    setup:
+      - uses: astral-sh/setup-uv@v7
 nodes:
+  workflow-graph:
+    title: Workflow graph validation
+    profile: quality-graph
+    run: uvx --from quality-graph-cli==0.1.8 --with quality-graph-github==0.1.8 qg validate
   build:
     title: Build binary
+    needs: [workflow-graph]
     run: go build ./cmd/dsy
   test:
     title: Run tests
+    needs: [workflow-graph]
     run: go test ./...

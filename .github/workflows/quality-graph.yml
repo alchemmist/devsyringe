@@ -12,6 +12,58 @@ concurrency:
   group: quality-graph-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  workflow-graph:
+    name: Workflow graph validation
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: 'false'
+      - uses: actions/setup-go@v7
+        with:
+          go-version: '1.27'
+      - name: Install dependencies
+        run: 'go mod tidy
+
+          git diff --exit-code -- go.mod go.sum
+
+          '
+      - uses: astral-sh/setup-uv@v7
+      - run: uvx --from quality-graph-cli==0.1.8 --with quality-graph-github==0.1.8 qg validate
+        name: Run Workflow graph validation
+        id: quality-command
+        continue-on-error: true
+      - name: Collect Workflow graph validation result
+        id: quality-result
+        if: always()
+        uses: alchemmist/quality-graph@b947f26e97ccf1c755050dfe38d98cbb688edb69
+        with:
+          operation: collect
+          node-id: workflow-graph
+          title: Workflow graph validation
+          adapter: exit-code
+          report-path: ''
+          command-outcome: ${{ steps.quality-command.outcome }}
+          graph-digest: 6274b6b3bc083b3bbd696b343a14f2be75bd9f85b35893688744a4609d602e14
+          approval-findings: 'true'
+          approval-files: 'false'
+          approval-node: 'false'
+      - name: Upload Workflow graph validation result
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: quality-result-workflow-graph-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/quality-graph/workflow-graph.json
+          if-no-files-found: error
+          retention-days: 7
+      - name: Enforce Workflow graph validation result
+        if: always()
+        shell: bash
+        env:
+          EXIT_CODE: ${{ steps.quality-result.outputs.exit-code }}
+        run: exit "${EXIT_CODE:-2}"
   build:
     name: Build binary
     runs-on: ubuntu-latest
@@ -45,7 +97,7 @@ jobs:
           adapter: exit-code
           report-path: ''
           command-outcome: ${{ steps.quality-command.outcome }}
-          graph-digest: d33da993e3071b682f1ad32cec93842ad2cddb5af7dca5ff3a3bf6a4ee086666
+          graph-digest: 6274b6b3bc083b3bbd696b343a14f2be75bd9f85b35893688744a4609d602e14
           approval-findings: 'true'
           approval-files: 'false'
           approval-node: 'false'
@@ -63,6 +115,8 @@ jobs:
         env:
           EXIT_CODE: ${{ steps.quality-result.outputs.exit-code }}
         run: exit "${EXIT_CODE:-2}"
+    needs:
+      - workflow-graph
   test:
     name: Run tests
     runs-on: ubuntu-latest
@@ -96,7 +150,7 @@ jobs:
           adapter: exit-code
           report-path: ''
           command-outcome: ${{ steps.quality-command.outcome }}
-          graph-digest: d33da993e3071b682f1ad32cec93842ad2cddb5af7dca5ff3a3bf6a4ee086666
+          graph-digest: 6274b6b3bc083b3bbd696b343a14f2be75bd9f85b35893688744a4609d602e14
           approval-findings: 'true'
           approval-files: 'false'
           approval-node: 'false'
@@ -114,3 +168,5 @@ jobs:
         env:
           EXIT_CODE: ${{ steps.quality-result.outputs.exit-code }}
         run: exit "${EXIT_CODE:-2}"
+    needs:
+      - workflow-graph
