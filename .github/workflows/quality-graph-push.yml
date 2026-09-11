@@ -45,7 +45,7 @@ jobs:
           adapter: exit-code
           report-path: ''
           command-outcome: ${{ steps.quality-command.outcome }}
-          graph-digest: 6274b6b3bc083b3bbd696b343a14f2be75bd9f85b35893688744a4609d602e14
+          graph-digest: 10c1f1316a2fcdd3c30a48e1d57ea1bcc55f0850531ed810b07ac8e6cff45a89
           approval-findings: 'true'
           approval-files: 'false'
           approval-node: 'false'
@@ -96,7 +96,7 @@ jobs:
           adapter: exit-code
           report-path: ''
           command-outcome: ${{ steps.quality-command.outcome }}
-          graph-digest: 6274b6b3bc083b3bbd696b343a14f2be75bd9f85b35893688744a4609d602e14
+          graph-digest: 10c1f1316a2fcdd3c30a48e1d57ea1bcc55f0850531ed810b07ac8e6cff45a89
           approval-findings: 'true'
           approval-files: 'false'
           approval-node: 'false'
@@ -149,7 +149,7 @@ jobs:
           adapter: exit-code
           report-path: ''
           command-outcome: ${{ steps.quality-command.outcome }}
-          graph-digest: 6274b6b3bc083b3bbd696b343a14f2be75bd9f85b35893688744a4609d602e14
+          graph-digest: 10c1f1316a2fcdd3c30a48e1d57ea1bcc55f0850531ed810b07ac8e6cff45a89
           approval-findings: 'true'
           approval-files: 'false'
           approval-node: 'false'
