@@ -6,7 +6,7 @@
     ]
   },
   "defaultBranch": "main",
-  "graphDigest": "6274b6b3bc083b3bbd696b343a14f2be75bd9f85b35893688744a4609d602e14",
+  "graphDigest": "10c1f1316a2fcdd3c30a48e1d57ea1bcc55f0850531ed810b07ac8e6cff45a89",
   "graphVersion": 0,
   "labels": {
     "enabled": false
@@ -142,7 +142,7 @@
           "run": "go mod tidy\ngit diff --exit-code -- go.mod go.sum\n"
         },
         {
-          "uses": "astral-sh/setup-uv@v7"
+          "uses": "astral-sh/setup-uv@v10.1.0"
         }
       ]
     }
